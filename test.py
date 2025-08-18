@@ -1,46 +1,45 @@
 import unittest
-from main import add, subtract, multiply, divide, modulo, check
+import pytest
+from main import count_vowels
 
-class TestCheck(unittest.TestCase):
-    def test_check(self):
-        self.assertTrue(check(2))
-        self.assertTrue(check(6))
-        self.assertTrue(check(220))
 
-        self.assertFalse(check(1))
-        self.assertFalse(check(3))
-        self.assertFalse(check(57))
+# Тесты для unittest
+class TestCountVowelsUnittest(unittest.TestCase):
+    def test_all_vowels(self):
+        self.assertEqual(count_vowels("aeiouAEIOU"), 10)
+        self.assertEqual(count_vowels("aaa"), 3)
+        self.assertEqual(count_vowels(""), 0)
 
-class TestMath(unittest.TestCase):
-    def test_add(self):
-        self.assertEqual(add(2, 5), 7)
-        self.assertNotEqual(add(3, 7), 9)
+    def test_no_vowels(self):
+        self.assertEqual(count_vowels("bcdfg"), 0)
+        self.assertEqual(count_vowels("123!@#"), 0)
+        self.assertEqual(count_vowels("   "), 0)
 
-    def test_subtract(self):
-        self.assertEqual(subtract(7, 4), 3)
-        self.assertNotEqual(subtract(4, 2), 1)
+    def test_mixed_strings(self):
+        self.assertEqual(count_vowels("Hello, World!"), 3)
+        self.assertEqual(count_vowels("Python is awesome"), 6)
+        self.assertEqual(count_vowels("The quick brown fox"), 5)
 
-    def test_multiply(self):
-        self.assertNotEqual(multiply(2, 5), 12)
-        self.assertEqual(multiply(3, 6), 18)
 
-    def test_divide(self):
-        self.assertNotEqual(divide(4, 2), 3)
-        self.assertEqual(divide(20, 5), 4)
+# Тесты для pytest
+def test_all_vowels_pytest():
+    assert count_vowels("aeiouAEIOU") == 10
+    assert count_vowels("aaa") == 3
+    assert count_vowels("") == 0
 
-    def test_divide_by_zero(self):
-        self.assertRaises(ValueError, divide, 6, 0)
 
-class TestModulo(unittest.TestCase):
-    def test_modulo_success(self):
-        self.assertEqual(modulo(10, 3), 1)
-        self.assertEqual(modulo(15, 4), 3)
-        self.assertEqual(modulo(20, 5), 0)
-        self.assertEqual(modulo(8, 2), 0)
-        self.assertEqual(modulo(7, 2), 1)
+def test_no_vowels_pytest():
+    assert count_vowels("bcdfg") == 0
+    assert count_vowels("123!@#") == 0
+    assert count_vowels("   ") == 0
 
-    def test_modulo_by_zero(self):
-        self.assertRaises(ValueError, modulo, 10, 0)
 
-if __name__ == '__main__':
+def test_mixed_strings_pytest():
+    assert count_vowels("Hello, World!") == 3
+    assert count_vowels("Python is awesome") == 6
+    assert count_vowels("The quick brown fox") == 5
+
+
+# Запуск unittest (если файл запускается напрямую)
+if __name__ == "__main__":
     unittest.main()
