@@ -1,45 +1,40 @@
 import unittest
-import pytest
-from main import count_vowels
+from unittest.mock import patch, Mock
+from main import get_random_cat_image
+import requests
 
 
-# Тесты для unittest
-class TestCountVowelsUnittest(unittest.TestCase):
-    def test_all_vowels(self):
-        self.assertEqual(count_vowels("aeiouAEIOU"), 10)
-        self.assertEqual(count_vowels("aaa"), 3)
-        self.assertEqual(count_vowels(""), 0)
+class TestGetRandomCatImage(unittest.TestCase):
+    @patch("requests.get")
+    def test_successful_request(self, mock_get):
+        """Тест успешного запроса и возврата URL."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = [{"url": "https://example.com/cat.jpg"}]
+        mock_get.return_value = mock_response
 
-    def test_no_vowels(self):
-        self.assertEqual(count_vowels("bcdfg"), 0)
-        self.assertEqual(count_vowels("123!@#"), 0)
-        self.assertEqual(count_vowels("   "), 0)
+        result = get_random_cat_image()
+        self.assertEqual(result, "https://example.com/cat.jpg")
 
-    def test_mixed_strings(self):
-        self.assertEqual(count_vowels("Hello, World!"), 3)
-        self.assertEqual(count_vowels("Python is awesome"), 6)
-        self.assertEqual(count_vowels("The quick brown fox"), 5)
+    @patch("requests.get")
+    def test_failed_request_404(self, mock_get):
+        """Тест неуспешного запроса (404) и возврата None."""
+        mock_response = Mock()
+        mock_response.status_code = 404
+        mock_response.raise_for_status.side_effect = requests.HTTPError("404 Not Found")
+        mock_get.return_value = mock_response
 
+        result = get_random_cat_image()
+        self.assertIsNone(result)
 
-# Тесты для pytest
-def test_all_vowels_pytest():
-    assert count_vowels("aeiouAEIOU") == 10
-    assert count_vowels("aaa") == 3
-    assert count_vowels("") == 0
+    @patch("requests.get")
+    def test_request_exception_returns_none(self, mock_get):
+        """Тест обработки исключения при запросе (возвращает None)."""
+        mock_get.side_effect = requests.RequestException("Connection Error")
 
-
-def test_no_vowels_pytest():
-    assert count_vowels("bcdfg") == 0
-    assert count_vowels("123!@#") == 0
-    assert count_vowels("   ") == 0
-
-
-def test_mixed_strings_pytest():
-    assert count_vowels("Hello, World!") == 3
-    assert count_vowels("Python is awesome") == 6
-    assert count_vowels("The quick brown fox") == 5
+        result = get_random_cat_image()
+        self.assertIsNone(result)
 
 
-# Запуск unittest (если файл запускается напрямую)
 if __name__ == "__main__":
     unittest.main()
